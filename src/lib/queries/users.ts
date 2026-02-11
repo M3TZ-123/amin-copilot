@@ -3,6 +3,7 @@ import type { Role, SubscriptionStatus } from "@/generated/prisma/client";
 
 export async function getAllUsers() {
   return db.user.findMany({
+    where: { role: "USER" },
     include: {
       subscriptions: {
         orderBy: { createdAt: "desc" },
