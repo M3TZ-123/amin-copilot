@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  SUSPENDED
+  EXPIRED
+}
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  clerkId   String   @unique @map("clerk_id")
+  email     String   @unique
+  fullName  String   @map("full_name")
+  role      Role     @default(USER)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  subscriptions  Subscription[]
+  creditEntries  CreditLedger[] @relation("UserCredits")
+  adminEntries   CreditLedger[] @relation("AdminCredits")
+  payments       Payment[]
+
+  @@map("users")
+}
+
+model Subscription {
+  id        String             @id @default(uuid()) @db.Uuid
+  userId    String             @map("user_id") @db.Uuid
+  status    SubscriptionStatus @default(ACTIVE)
+  startedAt DateTime           @default(now()) @map("started_at")
+  expiresAt DateTime?          @map("expires_at")
+  createdAt DateTime           @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+model CreditLedger {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  delta     Int
+  note      String?
+  createdAt DateTime @default(now()) @map("created_at")
+  adminId   String   @map("admin_id") @db.Uuid
+
+  user  User @relation("UserCredits", fields: [userId], references: [id], onDelete: Cascade)
+  admin User @relation("AdminCredits", fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@map("credit_ledger")
+}
+
+model Payment {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  amountTnd Decimal  @map("amount_tnd") @db.Decimal(10, 3)
+  month     String
+  paidAt    DateTime @default(now()) @map("paid_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  note      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
