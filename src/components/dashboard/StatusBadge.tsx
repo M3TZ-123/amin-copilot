@@ -1,9 +1,13 @@
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
-type Status = "ACTIVE" | "SUSPENDED" | "EXPIRED";
+type Status = "PENDING_ACTIVATION" | "ACTIVE" | "SUSPENDED" | "EXPIRED";
 
 const statusConfig: Record<Status, { label: string; className: string }> = {
+  PENDING_ACTIVATION: {
+    label: "Pending",
+    className: "bg-orange-500/15 text-orange-400 border-orange-500/30",
+  },
   ACTIVE: {
     label: "Active",
     className: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",

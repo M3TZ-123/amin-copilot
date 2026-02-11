@@ -94,7 +94,7 @@ export function UsersTable() {
                   fullName: string;
                   email: string;
                   creditBalance: number;
-                  latestSubscription: { status: "ACTIVE" | "SUSPENDED" | "EXPIRED" } | null;
+                  latestSubscription: { status: "PENDING_ACTIVATION" | "ACTIVE" | "SUSPENDED" | "EXPIRED" } | null;
                   lastPayment: { amountTnd: string; paidAt: string } | null;
                 }) => (
                   <TableRow

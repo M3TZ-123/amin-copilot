@@ -14,7 +14,7 @@ const createUserSchema = z.object({
   initialCredits: z.number().int().min(0).default(0),
   paymentAmount: z.number().min(0).optional(),
   paymentMonth: z.string().optional(),
-  subscriptionStatus: z.enum(["ACTIVE", "SUSPENDED", "EXPIRED"]).default("ACTIVE"),
+  subscriptionStatus: z.enum(["PENDING_ACTIVATION", "ACTIVE", "SUSPENDED", "EXPIRED"]).default("ACTIVE"),
   expiresAt: z.string().optional(),
 });
 

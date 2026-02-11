@@ -120,6 +120,7 @@ export default function AddUserPage() {
                 </SelectTrigger>
                 <SelectContent className="bg-slate-800 border-slate-700">
                   <SelectItem value="ACTIVE">Active</SelectItem>
+                  <SelectItem value="PENDING_ACTIVATION">Pending Activation</SelectItem>
                   <SelectItem value="SUSPENDED">Suspended</SelectItem>
                   <SelectItem value="EXPIRED">Expired</SelectItem>
                 </SelectContent>

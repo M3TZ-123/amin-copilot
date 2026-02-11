@@ -20,7 +20,7 @@ const userNav = [
 const adminNav = [
   { label: "Overview", href: "/admin", icon: BarChart3 },
   { label: "Users", href: "/admin/users", icon: Users },
-  { label: "Add User", href: "/admin/users/new", icon: UserPlus },
+  { label: "Add User", href: "/admin/add-user", icon: UserPlus },
 ];
 
 interface SidebarProps {

@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { Webhook } from "svix";
 import { WebhookEvent } from "@clerk/nextjs/server";
-import { createUser, updateUserByClerkId, deleteUserByClerkId } from "@/lib/queries/users";
+import { createUser, updateUserByClerkId, deleteUserByClerkId, getUserByClerkId, createSubscription } from "@/lib/queries/users";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -45,12 +45,24 @@ export async function POST(req: Request) {
     const fullName = [first_name, last_name].filter(Boolean).join(" ") || "User";
     const role = (public_metadata as { role?: string })?.role === "admin" ? "ADMIN" : "USER";
 
-    await createUser({
-      clerkId: id,
-      email,
-      fullName,
-      role: role as "ADMIN" | "USER",
-    });
+    // Check if user already exists (from sync)
+    const existing = await getUserByClerkId(id);
+    if (!existing) {
+      const user = await createUser({
+        clerkId: id,
+        email,
+        fullName,
+        role: role as "ADMIN" | "USER",
+      });
+
+      // Create a PENDING_ACTIVATION subscription for regular users
+      if (role === "USER") {
+        await createSubscription({
+          userId: user.id,
+          status: "PENDING_ACTIVATION",
+        });
+      }
+    }
   }
 
   if (eventType === "user.updated") {
@@ -58,7 +70,11 @@ export async function POST(req: Request) {
     const email = email_addresses[0]?.email_address ?? "";
     const fullName = [first_name, last_name].filter(Boolean).join(" ") || "User";
 
-    await updateUserByClerkId(id, { email, fullName });
+    try {
+      await updateUserByClerkId(id, { email, fullName });
+    } catch {
+      console.log("User not found in DB during update");
+    }
   }
 
   if (eventType === "user.deleted") {

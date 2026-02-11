@@ -141,3 +141,57 @@ export async function getLatestSubscription(userId: string) {
     orderBy: { createdAt: "desc" },
   });
 }
+
+export async function getPendingUsers() {
+  return db.user.findMany({
+    where: {
+      role: "USER",
+      subscriptions: {
+        some: { status: "PENDING_ACTIVATION" },
+        none: { status: "ACTIVE" },
+      },
+    },
+    include: {
+      subscriptions: {
+        orderBy: { createdAt: "desc" },
+        take: 1,
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+export async function getAllClerkDbUsers() {
+  return db.user.findMany({
+    where: { role: "USER" },
+    include: {
+      subscriptions: {
+        orderBy: { createdAt: "desc" },
+        take: 1,
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+export async function upsertUserFromClerk(data: {
+  clerkId: string;
+  email: string;
+  fullName: string;
+  role: "ADMIN" | "USER";
+}) {
+  return db.user.upsert({
+    where: { clerkId: data.clerkId },
+    update: {
+      email: data.email,
+      fullName: data.fullName,
+      role: data.role,
+    },
+    create: {
+      clerkId: data.clerkId,
+      email: data.email,
+      fullName: data.fullName,
+      role: data.role,
+    },
+  });
+}

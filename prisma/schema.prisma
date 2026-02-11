@@ -13,6 +13,7 @@ enum Role {
 }
 
 enum SubscriptionStatus {
+  PENDING_ACTIVATION
   ACTIVE
   SUSPENDED
   EXPIRED
